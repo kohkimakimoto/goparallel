@@ -40,8 +40,7 @@ echo -e "cmd:echo one\tprefix:[aaa]\ncmd:echo two\tprefix:[bbb]" | goparallel
 
 Goparallel supports other formats to defines commands. use `-f` option.
 
-YAML format
-
+YAML format.
 ```
 $ cat commands.yml
 - {cmd: "echo one", prefix: "[aaa]"}
@@ -52,9 +51,7 @@ $ cat commands.yml  | goparallel -f=yaml
 [bbb] two
 ```
 
-
-JSON format
-
+JSON format.
 ```
 $ cat commands.json
 [
