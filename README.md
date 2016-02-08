@@ -12,13 +12,27 @@ Goparallel is provided as a single binary. You can download it and drop it in yo
 
 Pass commands list that are executed in parallel to `goparallel` by the stdin.
 
+Example1) From a file using `cat` command.
+
+```
+cat commands.ltsv
+cmd:echo one
+cmd:echo two
+
+cat commands.ltsv | goparallel
+one
+two
+```
+
+Example2) Use echo.
+
 ```
 echo -e "cmd:echo one\ncmd:echo two" | goparallel
 one
 two
 ```
 
-You can use a argument instead of stdin.
+Example3) You can use a argument instead of stdin.
 
 ```
 $ goparallel "cmd:echo one
