@@ -1,31 +1,31 @@
 package goparallel
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
+	"github.com/kohkimakimoto/goparallel/goparallel/ltsv"
+	"gopkg.in/yaml.v2"
+	"io"
 	"os"
 	"os/exec"
 	"runtime"
 	"sync"
-	"bufio"
 	"time"
-	"io"
-	"bytes"
-	"github.com/kohkimakimoto/goparallel/goparallel/ltsv"
-	"gopkg.in/yaml.v2"
-	"encoding/json"
 )
 
 var (
-	ErrorTimeout = errors.New("operation timeout")
-	ErrorCmdUndefined = errors.New("cmd undefined.")
+	ErrorTimeout           = errors.New("operation timeout")
+	ErrorCmdUndefined      = errors.New("cmd undefined.")
 	ErrorUnsupportedFormat = errors.New("unsupported format.")
 )
 
-const (
-	JobFormatLTSV = 0
-)
+type job struct {
+	Cmd    string `yaml:"cmd",json:"cmd"`
+	Prefix string `yaml:"prefix",json:"prefix"`
+}
 
 func Start() error {
 	var timeoutFlag int64
@@ -67,12 +67,12 @@ func Start() error {
 		if err != nil {
 			return err
 		}
-	}else if jobsFormat == "yaml" {
+	} else if jobsFormat == "yaml" {
 		jobs, err = loadJobsFromYAML(reader)
 		if err != nil {
 			return err
 		}
-	}else if jobsFormat == "json" {
+	} else if jobsFormat == "json" {
 		jobs, err = loadJobsFromJSON(reader)
 		if err != nil {
 			return err
@@ -102,16 +102,12 @@ func Start() error {
 			cmd := exec.Command(shell, flag, command)
 			cmd.Stdin = nil
 
-			stdout, err := cmd.StdoutPipe()
-			if err != nil {
-				errchan <- err
-				return
-			}
-
-			stderr, err := cmd.StderrPipe()
-			if err != nil {
-				errchan <- err
-				return
+			if j.Prefix != "" {
+				cmd.Stdout = newPrefixWriter(os.Stdout, j.Prefix+" ")
+				cmd.Stderr = newPrefixWriter(os.Stderr, j.Prefix+" ")
+			} else {
+				cmd.Stdout = newPrefixWriter(os.Stdout, "")
+				cmd.Stderr = newPrefixWriter(os.Stderr, "")
 			}
 
 			if err := cmd.Start(); err != nil {
@@ -121,9 +117,6 @@ func Start() error {
 
 			addProcess(cmd.Process)
 			defer deleteProecess(cmd.Process)
-
-			go scanLines(stdout, os.Stderr, j)
-			go scanLines(stderr, os.Stdout, j)
 
 			if err := cmd.Wait(); err != nil {
 				errchan <- err
@@ -135,10 +128,10 @@ func Start() error {
 	}
 
 	wait := make(chan bool)
-	go func() {
+	go func(wg *sync.WaitGroup) {
 		wg.Wait()
 		wait <- true
-	}()
+	}(wg)
 
 	timeout := make(chan bool)
 	if timeoutFlag != 0 {
@@ -159,30 +152,6 @@ func Start() error {
 	}
 
 	return nil
-}
-
-func scanLines(src io.ReadCloser, dest io.Writer, j *job) {
-	scanner := bufio.NewScanner(src)
-	for scanner.Scan() {
-		print(dest, j.Prefix, scanner.Text())
-	}
-}
-
-var printMutex sync.Mutex
-
-func print(dest io.Writer, prefix string, text string) {
-	printMutex.Lock()
-	defer printMutex.Unlock()
-	if prefix != "" {
-		fmt.Fprintln(dest, prefix, text)
-	} else {
-		fmt.Fprintln(dest, text)
-	}
-}
-
-type job struct {
-	Cmd    string `yaml:"cmd",json:"cmd"`
-	Prefix string `yaml:"prefix",json:"prefix"`
 }
 
 func loadJobsFromLTSV(r io.Reader) ([]*job, error) {
