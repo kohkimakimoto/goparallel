@@ -32,8 +32,8 @@ func (w *prefixedWriter) Write(data []byte) (int, error) {
 	dataStr := string(data)
 	dataStr = strings.Replace(dataStr, "\r\n", "\n", -1)
 	if w.Prefix != "" {
-		dataStr = strings.Replace(dataStr, "\n", "\n"+w.Prefix, strings.Count(dataStr, "\n") - 1)
-		fmt.Fprint(w.Writer, w.Prefix + dataStr)
+		dataStr = strings.Replace(dataStr, "\n", "\n"+w.Prefix, strings.Count(dataStr, "\n")-1)
+		fmt.Fprint(w.Writer, w.Prefix+dataStr)
 	} else {
 		fmt.Fprint(w.Writer, dataStr)
 	}
