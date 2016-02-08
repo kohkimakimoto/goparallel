@@ -15,11 +15,11 @@ Pass commands list that are executed in parallel to `goparallel` by the stdin.
 Example1) From a file using `cat` command.
 
 ```
-cat commands.ltsv
+$ cat commands.ltsv
 cmd:echo one
 cmd:echo two
 
-cat commands.ltsv | goparallel
+$ cat commands.ltsv | goparallel
 one
 two
 ```
@@ -27,7 +27,7 @@ two
 Example2) Use echo.
 
 ```
-echo -e "cmd:echo one\ncmd:echo two" | goparallel
+$ echo -e "cmd:echo one\ncmd:echo two" | goparallel
 one
 two
 ```
@@ -47,7 +47,7 @@ Above examples use `cmd` key that defines command to execute.
 You can use `prefix` key to output with a prefix.
 
 ```
-echo -e "cmd:echo one\tprefix:[aaa]\ncmd:echo two\tprefix:[bbb]" | goparallel
+$ echo -e "cmd:echo one\tprefix:[aaa]\ncmd:echo two\tprefix:[bbb]" | goparallel
 [aaa] one
 [bbb] two
 ```
