@@ -31,10 +31,27 @@ func (w *prefixedWriter) Write(data []byte) (int, error) {
 
 	dataStr := string(data)
 	dataStr = strings.Replace(dataStr, "\r\n", "\n", -1)
+
+	var hasNewline = false
+	if dataStr[len(dataStr)-1:] == "\n" {
+		hasNewline = true
+	}
+
 	if w.Prefix != "" {
-		dataStr = strings.Replace(dataStr, "\n", "\n"+w.Prefix, strings.Count(dataStr, "\n")-1)
+		if hasNewline {
+			dataStr = strings.Replace(dataStr, "\n", "\n"+w.Prefix, strings.Count(dataStr, "\n")-1)
+		} else {
+			dataStr = strings.Replace(dataStr, "\n", "\n"+w.Prefix, -1) + "\n"
+		}
+
 		fmt.Fprint(w.Writer, w.Prefix+dataStr)
 	} else {
+		if hasNewline {
+			// nothing to do.
+		} else {
+			dataStr = dataStr + "\n"
+		}
+
 		fmt.Fprint(w.Writer, dataStr)
 	}
 
