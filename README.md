@@ -38,7 +38,7 @@ echo -e "cmd:echo one\tprefix:[aaa]\ncmd:echo two\tprefix:[bbb]" | goparallel
 [bbb] two
 ```
 
-Goparallel supports other formats to defines commands. use `-f` option.
+Goparallel supports other formats. use `-f` option.
 
 YAML format.
 ```
