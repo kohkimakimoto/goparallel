@@ -4,7 +4,7 @@ Execute commands in parallel.
 
 ## Installation
 
-Parallel is provided as a single binary. You can download it and drop it in your $PATH.
+Goparallel is provided as a single binary. You can download it and drop it in your $PATH.
 
 [Download latest version](https://github.com/kohkimakimoto/goparallel/releases/latest)
 
