@@ -30,7 +30,7 @@ two
 The commands list is defined in a LTSV format at default.
 Above examples use `cmd` key that defines command to execute.
 
-You can use `prefix` key to output of the commands with a prefix.
+You can use `prefix` key to output with a prefix.
 
 ```
 echo -e "cmd:echo one\tprefix:[aaa]\ncmd:echo two\tprefix:[bbb]" | goparallel
